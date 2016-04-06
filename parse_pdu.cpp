@@ -45,9 +45,10 @@ int main() {
 
 	    source_addr = token[1];
 	    dest_addr = token[2];
+	    ttl = atoi(token[4]);
 	    source_port = token[5];
 	    dest_port = token[6];
-	    ttl = atoi(token[4]);
+	    
 
 	    int bit;
 	    char *pch;

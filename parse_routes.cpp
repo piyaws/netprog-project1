@@ -27,7 +27,8 @@ int main() {
 
 
     // PARSING destination cidr gateway interface
-    string destination, cidr, gateway, interface;
+    string destination, gateway, interface;
+    int cidr;
 
 	// read each line of the file
   	while (!fin.eof()) {
@@ -51,7 +52,7 @@ int main() {
 	    }
 
 	    destination = token[0];
-	    cidr = token[1];
+	    cidr = atoi(token[1]);
 	    gateway = token[2];
 	    interface = token[3];
 
@@ -74,6 +75,7 @@ int main() {
 	    }
 	    
 	    cout << "IP address of the destination in binary: " << ip_addr_in_bit << endl;
+
 	    cout << endl;
 
 	}
