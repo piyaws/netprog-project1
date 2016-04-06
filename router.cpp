@@ -22,6 +22,7 @@ string getMAC(string gateway) {
 int main() {
 	
 	// 1. BUILDING THE BINARY TREE FOR THE ROUTING
+
 	struct node *root; // root of our tree
 	root = (struct node*) malloc( sizeof( struct node ) );
 	struct node *cur; // use to traverse
@@ -32,6 +33,7 @@ int main() {
 	string interface = "eth1";
 	cur = root;
 
+	// loop for each line of routes.txt
 	for (int i = 0 ; i < cidr; i++) {
         if (address_binary[i] == '0') {
         	if (cur->left == NULL) {
@@ -70,5 +72,21 @@ int main() {
 	string dest_addr_bin = "00000101000001100000011100001000";
 	string dest_port = "22";
 	int ttl = 11;
-	
+
+	/*for (int i = 0 ; i < dest_addr_bin.length(); i++) {
+        if (address_binary[i] == '0') {
+        	if (cur->left == NULL) {
+        		cur->left = (struct node*) malloc( sizeof( struct node ) );
+        	}
+    		cout << "Go left" << endl;
+			cur = cur->left;
+        }
+        else {
+        	if (cur->right == NULL) {
+        		cur->right = (struct node*) malloc( sizeof( struct node ) );
+        	}
+        	cout << "Go right" << endl;
+        	cur = cur->right;
+        }
+	}*/
 }
