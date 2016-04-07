@@ -19,3 +19,11 @@ string getMAC(string gateway, map<string,string>* arp_map) {
 
 // This is how you can call it in main to get the MAC address
 cout << "getMAC result " << getMAC("1.2.3.4", &arp_map) << endl;
+
+/*
+  To deal with directly connected interface, add this to main
+*/
+if (getMAC(gateway, &arp_map) == "default gateway"){
+  // traverse the tree to find /32 and get the ip address in front of it to be printed
+  // I'm not too sure on how to traverse the tree, but this is the idea, Thank you :)
+}
