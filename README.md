@@ -8,7 +8,7 @@ PROJECT 1 SUBMISSION
 - router.cpp: source code, router: executable file
 - to compile: g++ -std=c++11 -o router router.cpp
 - to run: ./router
-- tested on Ubuntu 14.04
+- tested on Ubuntu 14.04 and MAC OSX 10.11.4
 - compiler: g++ (Ubuntu 4.8.4-2ubuntu1~14.04.1) 4.8.4
 
 2. BINARY SEARCH TREE IMPLEMENTATION
