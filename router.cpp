@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <bitset>
 #include <typeinfo>
+#include <map>
 
 const int MAX_CHARS_PER_LINE = 512;
 const int MAX_TOKENS_PER_LINE = 20;
@@ -22,12 +23,21 @@ struct node
   struct node *right;
 };
 
-/* @Yu: mac address lookup
-	put your code here
+/* Lookup physical address from ip address
 */
-string getMAC(string gateway) {
-	return "aa:bb:cc:dd:ee:ff";
+string getMAC(string gateway, map<string,string>* arp_map) {
+    map<string,string>::iterator it = arp_map->begin();
+    for (it = arp_map->begin(); it != arp_map->end(); ++it){
+        if (it->first == gateway){
+            return it->second;
+        }
+    }
+    if (gateway == "0.0.0.0"){
+        return "default gateway";
+    }
+    return "no MAC address found";
 }
+
 
 int main() {
 
@@ -36,6 +46,7 @@ int main() {
 	struct node *root; // root of our tree
 	root = (struct node*) malloc( sizeof( struct node ) );
 	struct node *cur; // use to traverse
+	string *default_gateway;
 
 	// reading routes.txt
   	ifstream fin;
@@ -75,6 +86,12 @@ int main() {
 	    gateway = token[2];
 	    interface = token[3];
 
+	    // default gateway
+	    if (destination.compare("0.0.0.0") == 0 && cidr == 0) {
+	    	default_gateway = new string (gateway);
+	    	cout << "default gateway: " << *default_gateway << endl;
+	    }
+
 	    int bit;
 	    char *pch;
 	    string ip_addr_in_bit = "";
@@ -87,12 +104,6 @@ int main() {
 
 	    	pch = strtok(NULL,".");
 	    }
-
-	    /*cout << "IP address of the destination in binary: " << ip_addr_in_bit << endl;
-	    cout << "destination = " << destination << endl;
-	    cout << "cidr = " << cidr << endl;
-	    cout << "gateway = " << gateway << endl;
-	    cout << "interface = " << interface << endl << endl;*/
 
 	    /* traversing tree */
 		cur = root;
@@ -129,7 +140,44 @@ int main() {
 	fin.close();
 
 	// 2. PARSING ARP.TXT AND CREATE A MAP TO LOOKUP MAP ADDRESS
-	// @Yu: your code here
+	// open the file to be parsed
+    fin.open("arp.txt"); // open a file
+    if (!fin.good()){
+        fprintf(stderr, "File not found\n");
+        return 1; // exit if file not found
+    }
+
+    // PARSING
+    string ip_addr, eth_addr;
+    map<string,string> arp_map;
+    // read each line of the file
+    while (!fin.eof()) {
+        // read an entire line into memory
+        char buf[MAX_CHARS_PER_LINE];
+        fin.getline(buf, MAX_CHARS_PER_LINE);
+        
+        // parse the line into blank-delimited tokens
+        int n = 0; // a for-loop index
+        
+        // array to store memory addresses of the tokens in buf
+        const char* token[MAX_TOKENS_PER_LINE] = {}; // initialize to 0
+        
+        // parse the line
+        token[0] = strtok(buf, DELIMITER); // first token
+        if (token[0]) { // zero if line is blank
+            for (n = 1; n < MAX_TOKENS_PER_LINE; n++) {
+                token[n] = strtok(0, DELIMITER); // subsequent tokens
+                if (!token[n]) break; // no more tokens
+            }
+        }
+        
+        ip_addr = token[0];
+        eth_addr = token[1];
+
+        arp_map.insert ( pair<string,string>(ip_addr,eth_addr) );
+        
+    }
+    fin.close();
 
 	// 3. PARSING PDU.TXT AND ROUTE
 
@@ -213,9 +261,17 @@ int main() {
 		        }
 			}
 			if (gateway == NULL) {
-				cout << " No route (use default gateway)" << endl;
-			} else {
-				cout << " via " << *gateway << "(" << *interface << "-" << getMAC(*gateway) << " ttl " << ttl-1 << endl;
+				if (default_gateway == NULL) {
+					cout << " destination unreachable, and there is no default gateway!" << endl;
+				} else {
+					cout << " via " << *default_gateway << " (ppp0) ttl " << ttl-1 << " (No path found, hence using default gateway)" << endl;
+				}
+
+			} else if ((*gateway).compare("0.0.0.0") == 0) {
+				cout << " directly connected (" << *interface << "-" << *default_gateway << ") ttl " << ttl-1 << endl;
+			} 
+			else {
+				cout << " via " << *gateway << " (" << *interface << "-" << getMAC(*gateway, &arp_map) << ") ttl " << ttl-1 << endl;
 			}
 	    }
 
