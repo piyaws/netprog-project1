@@ -89,7 +89,6 @@ int main() {
 	    // default gateway
 	    if (destination.compare("0.0.0.0") == 0 && cidr == 0) {
 	    	default_gateway = new string (gateway);
-	    	cout << "default gateway: " << *default_gateway << endl;
 	    }
 
 	    int bit;
